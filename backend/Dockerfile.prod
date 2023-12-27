@@ -1,0 +1,48 @@
+FROM python:3.10.11-alpine as builder
+
+WORKDIR /Users/Admin/Documents/epistaime/backend
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONBUFFERED 1
+
+RUN apk update \
+    && apk add postgresql-dev gcc g++ python3-dev musl-dev
+
+RUN pip install --upgrade pip
+COPY . .
+
+
+COPY ./requirements.txt .
+COPY .env.EPM .
+COPY .env.INFO .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /Users/Admin/Documents/epistaime/backend/wheels -r requirements.txt
+
+FROM python:3.10.11-alpine
+
+RUN mkdir -p /home/backend
+
+RUN addgroup -S app && adduser -S app -G app
+
+ENV HOME=/home/backend
+ENV APP_HOME=/home/backend/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/staticfiles
+WORKDIR $APP_HOME
+
+RUN apk update && apk add libpq
+COPY --from=builder /Users/Admin/Documents/epistaime/backend/wheels /wheels
+COPY --from=builder /Users/Admin/Documents/epistaime/backend/requirements.txt .
+RUN pip install --no-cache /wheels/*
+
+COPY ./entrypoint.prod.sh .
+RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.prod.sh
+RUN chmod +x $APP_HOME/entrypoint.prod.sh
+
+COPY . $APP_HOME
+
+RUN chown -R app:app $APP_HOME
+
+USER app
+
+ENTRYPOINT [ "/home/backend/web/entrypoint.prod.sh" ]
+

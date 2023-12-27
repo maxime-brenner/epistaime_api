@@ -1,0 +1,11 @@
+#env
+env/
+.env
+.env.*
+
+#scripts
+*.bat
+
+#migrations files from django's apps
+migrations/
+__pycache__/
