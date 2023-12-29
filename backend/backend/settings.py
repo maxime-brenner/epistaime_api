@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'scraper',
     'generator',
     'nlp',
+    'shortener',
 ]
 
 MIDDLEWARE = [

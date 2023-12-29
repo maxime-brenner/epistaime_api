@@ -22,6 +22,7 @@ from api.views import PostView, TweetRandomPost, ExportToCSV
 from scraper.views import ArticleStreaming, RetrieveArticleStream, UpdateItemFromStream, CreatePostFromStream, RetrieveArticleView, CreatePostAndGenerateTextFromStream, ScrapFetchTrends, GoogleNewsSearch
 from twitter.views import TwitterManager, FetchTrends
 from generator.views import Generator
+from shortener.views import redirect_url
 from rest_framework import routers
 
 #Post
@@ -48,4 +49,5 @@ urlpatterns = [
     path('api/scraper/createandgenerate/bfmtv/', CreatePostAndGenerateTextFromStream.as_view()),
     path('api/scraper/trends/', ScrapFetchTrends.as_view()),
     path('api/generator/', Generator.as_view()),
+    path('api/short/<str:key>/', redirect_url)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
